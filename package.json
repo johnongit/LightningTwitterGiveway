@@ -1,0 +1,24 @@
+{
+  "name": "twitter-stats-giveaway",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "btoa": "^1.2.1",
+    "dotenv": "^10.0.0",
+    "http": "0.0.1-security",
+    "node-canvas": "^2.7.0",
+    "sharp": "^0.28.3",
+    "svg-modify": "0.0.12",
+    "svg2img": "^0.6.3",
+    "twit": "^2.2.11",
+    "twitt": "^1.0.0",
+    "twitter": "^1.7.1",
+    "twitter-v2": "^1.1.0"
+  }
+}
