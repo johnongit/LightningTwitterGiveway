@@ -5,8 +5,8 @@ const lnbitsConfig = {
     host: process.env.LNBITS_HOST,
     min_withdrawable: 10,
     max_withdrawable: 10,
-    uses: 5,
-    wait_time: 60
+    uses: 1,
+    wait_time: 10
 }
 
 const twitterConfig = {
@@ -14,7 +14,8 @@ const twitterConfig = {
     consumer_secret: process.env.CONSUMER_SECRET,
     access_token_key: process.env.ACCESS_TOKEN_KEY,
     access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-    status: "Giveaway lightning de test"
+    start_giveaway: "Giveaway lightning de test",
+    stop_giveaway: "C'est terminé"
 }
 
 module.exports = {

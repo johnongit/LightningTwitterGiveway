@@ -67,6 +67,7 @@ function createLnUrlW(lnbits_remote,lnbits_lnurlw_params) {
             }
         });
         req.on('error', err => {
+            console.log("err")
             reject(err);
             
         })
@@ -105,8 +106,69 @@ function getLnUrlWImg(params,lnbits_remote) {
     })
 }
 
+function getLnUrlW(params,lnbits_remote) {
+    const options = {
+        host: lnbits_remote.host,
+        port: 443,
+        path: '/withdraw/api/v1/links/' + params.id,
+        method: 'GET',
+        headers: {
+            "X-Api-Key": lnbits_remote.admin_key
+        }
+    };
+    return new Promise(function(resolve, reject) {
+        const req = https.request(options, function(res) {
+
+            if(res.statusCode == 200) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    resolve(chunk)
+                });
+            } else {
+                reject(res)
+            }
+        });
+        req.on('error', (e) => {
+            reject(e)
+        });
+        req.end();
+    })
+}
+
+function delLnUrlW(params,lnbits_remote) {
+    const options = {
+        host: lnbits_remote.host,
+        port: 443,
+        path: '/withdraw/api/v1/links/' + params.id,
+        method: 'DELETE',
+        headers: {
+            "X-Api-Key": lnbits_remote.admin_key
+        }
+    };
+    return new Promise(function(resolve, reject) {
+        const req = https.request(options, function(res) {
+
+            if(res.statusCode == 204) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    resolve(chunk)
+                });
+            } else {
+                reject(res)
+            }
+        });
+        req.on('error', (e) => {
+            reject(e)
+        });
+        req.end();
+    })
+}
+
+
 module.exports = {
     getWallet,
     createLnUrlW,
     getLnUrlWImg,
+    getLnUrlW,
+    delLnUrlW,
 }

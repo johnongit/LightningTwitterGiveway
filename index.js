@@ -22,19 +22,54 @@ const lnbits_lnurlw_params={
     "uses":config.uses,
     "wait_time": config.wait_time
 }
-
+function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
 async function runBot() {
     try {
         lnurl = await lnbitconnect.createLnUrlW(lnbits_remote, lnbits_lnurlw_params)
         lnurl = JSON.parse(lnurl)
         svg = await lnbitconnect.getLnUrlWImg(lnurl,lnbits_remote)
+        
         await convert.convertSvg2Img(svg)
-        imgupld = await twitter.uploadImg()
-        media_id_string = imgupld.media_id_string
+        let imgupld = await twitter.uploadImg()
+        let media_id_string = imgupld.media_id_string
+
+        // delete image file
         fs.unlinkSync('lnurl.png')
 
-        tweet = await twitter.sendTweet(media_id_string)
+        let tweet = await twitter.sendTweet(media_id_string)
         console.log('You successfully tweeted this : "' + tweet.text + '"');
+        
+       used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
+       uses = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).uses
+       console.log(uses)
+       while(used<config.uses) {
+        await sleep(10000);
+        used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
+        console.log(used)
+       }
+       console.log("Giveway terminé.")
+       try {
+        lnbitconnect.delLnUrlW(lnurl, lnbits_remote)
+        console.log("LNURL supprimé")
+       }
+       catch {
+           return "Impossible de supprimer la LNurl"
+       }
+
+       try {
+           let close = await twitter.replyTweet(tweet.id_str)
+           console.log("Le tweet de de fermeture a été envoyé ", close)
+       }
+       catch (err){
+           console.log("error", err)
+           return "Impossible de supprimer le tweet " + err
+       }
+
+
 
     }
     catch (err) {

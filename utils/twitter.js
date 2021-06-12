@@ -12,7 +12,7 @@ const client = new Twitter({
 
 function sendTweet(media_id_string) {
     let message={
-        "status": config.status,
+        "status": config.start_giveaway,
         "media_ids": media_id_string
     }
     return new Promise(function(resolve, reject) {
@@ -23,6 +23,21 @@ function sendTweet(media_id_string) {
         .catch((err) => reject(err));
     });
 }
+
+function replyTweet(status_id) {
+    let message={
+        "status": config.stop_giveaway,
+        "in_reply_to_status_id": status_id
+    }
+    return new Promise(function(resolve, reject) {
+        client.post('statuses/update', message)
+        .then(result => {
+            resolve(result)
+        })
+        .catch((err) => reject(err));
+    });
+}
+
 function uploadImg() {
     const data = require('fs').readFileSync('./lnurl.png');
 
@@ -38,4 +53,5 @@ function uploadImg() {
 module.exports = {
     sendTweet,
     uploadImg,
+    replyTweet,
 }
