@@ -2,6 +2,7 @@ const { resolve } = require("path");
 const { exit } = require("process");
 var fs = require('fs');
 const schedule = require('node-schedule')
+const moment = require("moment")
 
 
 
@@ -28,8 +29,15 @@ function sleep(ms) {
       setTimeout(resolve, ms);
     });
   }
+
+  function between(min, max) {  
+    return Math.floor(
+      Math.random() * (max - min) + min
+    )
+  }
 async function runBot() {
     try {
+        console.log("Start Giveaway")
         // Create lnurl
         lnurl = await lnbitconnect.createLnUrlW(lnbits_remote, lnbits_lnurlw_params)
         lnurl = JSON.parse(lnurl)
@@ -38,6 +46,7 @@ async function runBot() {
         await convert.convertSvg2Img(svg)
 
         // upload it to twitter
+        /*
         let imgupld = await twitter.uploadImg()
         let media_id_string = imgupld.media_id_string
 
@@ -47,12 +56,12 @@ async function runBot() {
         // send tweet (start giveaway)
         let tweet = await twitter.sendTweet(media_id_string)
         console.log('You successfully tweeted this : "' + tweet.text + '"');
-        
+        */
         // check giveaway usage
         lnurllink = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote))
         used = lnurllink.used
         uses = lnurllink.uses
-        
+
         //poll lnurl usage
         while(used<config.uses) {
             await sleep(10000);
@@ -68,7 +77,7 @@ async function runBot() {
         .catch ((err) => {
             console.log("Cannot delete LNURL")
         })
-        
+        /*
         twitter.replyTweet(tweet.id_str)
         .then((tweet) => {
             console.log("Le tweet de de fermeture a été envoyé ", tweet.txt)
@@ -77,6 +86,7 @@ async function runBot() {
         .catch ((err) => {
             console.log("Cannot send close tweet")
         })
+        */
 
 
 
@@ -89,8 +99,19 @@ lnbitconnect.getWallet(lnbits_remote)
 .then(function (wallet) {
     wallet = JSON.parse(wallet)
     console.log("Connected to wallet: ", wallet.name)
-    runBot()
-    .catch((err) => console.log("Error ", err))
+    const rule = new schedule.RecurrenceRule();
+    rule.minute=between(0,59)
+    const job = schedule.scheduleJob(rule, function(){
+        let date = new Date().toISOString()
+        console.log("--------------")
+        console.log(date);
+        runBot()
+        .catch((err) => console.log("Error ", err))
+        job.cancel()
+        rule.minute=between(0,59)
+        rule.hour= moment().add(1,"hour").hour()
+        job.reschedule(rule)
+    });
 })
 .catch((err) => {
     console.log("Cannot connect to lnbits wallets");
