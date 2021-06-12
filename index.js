@@ -1,7 +1,6 @@
 const { resolve } = require("path");
 const { exit } = require("process");
 var fs = require("fs");
-const schedule = require("node-schedule");
 
 const lnbitconnect = require("./utils/lnbitsconnect.js");
 const convert = require("./utils/convertsvg.js");
