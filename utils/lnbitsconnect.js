@@ -54,8 +54,8 @@ function createLnUrlW(lnbits_remote, lnbits_lnurlw_params) {
     const req = https.request(options, function (res) {
       if (res.statusCode == 201) {
         res.setEncoding("utf8");
-        res.on("data", (d) => {
-          resolve(JSON.parse(d));
+        res.on("data", (data) => {
+          resolve(JSON.parse(data));
         });
       } else {
         reject("Connot create LNURL, status code " + res.statCode);

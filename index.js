@@ -1,5 +1,3 @@
-const { resolve } = require("path");
-const { exit } = require("process");
 var fs = require("fs");
 
 const lnbitconnect = require("./utils/lnbitsconnect.js");
@@ -41,21 +39,8 @@ async function uploadLnUrlImg(lnurl) {
   return tweet;
 }
 
-function checkEndGiveaway(lnurl, tweet) {
-  const interval = setInterval(async () => {
-    const { used: updatedUsed } = await lnbitconnect.getLnUrlW(
-      lnurl,
-      lnbits_remote
-    );
-
-    logger.info(`Giveaway status: ${updatedUsed}`);
-
-    if (updatedUsed >= config.uses) {
-      logger.info(`Giveaway reached limit ${config.uses}`);
-      await endGiveaway(lnurl, tweet);
-      clearInterval(interval);
-    }
-  }, 10000);
+function sleep(timeout) {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
 async function endGiveaway(lnurl, tweet) {
@@ -79,6 +64,25 @@ async function endGiveaway(lnurl, tweet) {
   }
 }
 
+async function checkEndGiveaway(lnurl, tweet) {
+  let { used } = await lnbitconnect.getLnUrlW(lnurl, lnbits_remote);
+
+  while (used < config.uses) {
+    await sleep(10000);
+
+    const { used: updatedUsed } = await lnbitconnect.getLnUrlW(
+      lnurl,
+      lnbits_remote
+    );
+
+    logger.info(`Giveaway status: ${updatedUsed}`);
+
+    used = updatedUsed;
+  }
+
+  await endGiveaway(lnurl, tweet);
+}
+
 async function runBot() {
   // Create lnurl
   const lnurl = await lnbitconnect.createLnUrlW(
@@ -88,7 +92,7 @@ async function runBot() {
 
   const tweet = await uploadLnUrlImg(lnurl);
 
-  checkEndGiveaway(lnurl, tweet);
+  await checkEndGiveaway(lnurl, tweet);
 }
 
 lnbitconnect
