@@ -62,7 +62,7 @@ async function runBot() {
 
        try {
            let close = await twitter.replyTweet(tweet.id_str)
-           console.log("Le tweet de de fermeture a été envoyé ", close)
+           console.log("Le tweet de de fermeture a été envoyé ", close.txt)
        }
        catch (err){
            console.log("error", err)
