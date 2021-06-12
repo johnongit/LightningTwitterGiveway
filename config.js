@@ -14,8 +14,8 @@ const twitterConfig = {
   consumer_secret: process.env.CONSUMER_SECRET,
   access_token_key: process.env.ACCESS_TOKEN_KEY,
   access_token_secret: process.env.ACCESS_TOKEN_SECRET,
-  start_giveaway: "Giveaway lightning de test",
-  stop_giveaway: "C'est terminé",
+  start_giveaway: "Giveaway #bitcoin ! Munissez-vous d'un wallet lightning comme @PhoenixWallet @Breez_Tech @ZeusLN @bluewalletio @MuunWallet @walletofsatoshi. " + lnbitsConfig.uses + " x " + lnbitsConfig.min_withdrawable + " Satoshis à gagner tous les " + lnbitsConfig.wait_time + " minutes.",
+  stop_giveaway: "C'est terminé !",
 };
 
 module.exports = {
