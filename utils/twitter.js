@@ -1,6 +1,6 @@
 const Twitter = require('twitter');
 
-var config = require('../config.js').twitterConfig;
+const config = require('../config.js').twitterConfig;
 
 
 const client = new Twitter({
@@ -10,18 +10,21 @@ const client = new Twitter({
     access_token_secret: config.access_token_secret,
   });
 
-function sendTweet(message) {
+function sendTweet(media_id_string) {
+    let message={
+        "status": config.status,
+        "media_ids": media_id_string
+    }
     return new Promise(function(resolve, reject) {
         client.post('statuses/update', message)
         .then(result => {
-            console.log('You successfully tweeted this : "' + result.text + '"');
             resolve(result)
         })
         .catch((err) => reject(err));
     });
 }
 function uploadImg() {
-    var data = require('fs').readFileSync('./lnurl.png');
+    const data = require('fs').readFileSync('./lnurl.png');
 
     return new Promise(function(resolve, reject) {
         client.post('media/upload', {"media": data})

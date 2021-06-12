@@ -1,11 +1,11 @@
 
-var https = require("https");
+const https = require("https");
 
 
 
 
 function getWallet(lnbits_remote) {
-    options = {
+    const options = {
         host: lnbits_remote.host,
         port: 443,
         path: '/api/v1/wallet',
@@ -15,7 +15,7 @@ function getWallet(lnbits_remote) {
         }
     };
     return new Promise(function(resolve, reject) {
-        var req = https.request(options, function(res) {
+        const req = https.request(options, function(res) {
             if(res.statusCode == 200) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -34,7 +34,7 @@ function getWallet(lnbits_remote) {
 }
 
 function createLnUrlW(lnbits_remote,lnbits_lnurlw_params) {
-    data = JSON.stringify({
+    const data = JSON.stringify({
         title: "LnURL Giveaway",
         min_withdrawable: lnbits_lnurlw_params.min_withdrawable,
         max_withdrawable: lnbits_lnurlw_params.max_withdrawable,
@@ -42,7 +42,7 @@ function createLnUrlW(lnbits_remote,lnbits_lnurlw_params) {
         wait_time: lnbits_lnurlw_params.wait_time,
         is_unique:false
     })
-    options = {
+    const options = {
         host: lnbits_remote.host,
         port: 443,
         path: '/withdraw/api/v1/links',
@@ -55,7 +55,7 @@ function createLnUrlW(lnbits_remote,lnbits_lnurlw_params) {
     };
     
     return new Promise(function(resolve, reject) {
-        var req = https.request(options, function(res) {
+        const req = https.request(options, function(res) {
             if(res.statusCode == 201) {
                 res.setEncoding('utf8');
                 res.on('data', d => {
@@ -77,7 +77,7 @@ function createLnUrlW(lnbits_remote,lnbits_lnurlw_params) {
 }
 
 function getLnUrlWImg(params,lnbits_remote) {
-    options = {
+    const options = {
         host: lnbits_remote.host,
         port: 443,
         path: '/withdraw/img/' + params.id,
@@ -87,7 +87,7 @@ function getLnUrlWImg(params,lnbits_remote) {
         }
     };
     return new Promise(function(resolve, reject) {
-        var req = https.request(options, function(res) {
+        const req = https.request(options, function(res) {
 
             if(res.statusCode == 200) {
                 res.setEncoding('utf8');
