@@ -35,7 +35,6 @@ async function uploadLnUrlImg(lnurl) {
   // send tweet (start giveaway)
   const tweet = await twitter.sendTweet(media_id_string);
   logger.info(`You've successfully tweeted this : ${tweet.text}`);
-
   return tweet;
 }
 
@@ -50,18 +49,19 @@ async function endGiveaway(lnurl, tweet) {
     await lnbitconnect.delLnUrlW(lnurl, lnbits_remote);
     logger.info("LNURL deleted");
   } catch (err) {
-    logger.info("An error occured while trying to delete LNURL", err);
+    logger.info("An error occured while trying to delete LNURL");
   }
 
   try {
     let close = await twitter.replyTweet(tweet.id_str);
-    logger.info(`Giveaway closing tweet has been sent : ${close.txt}`);
+    logger.info(`Giveaway closing tweet has been sent : ${close.text}`);
   } catch (err) {
     logger.info(
       "An error occured while trying to send giveaway closing tweet",
       err
     );
   }
+
 }
 
 async function checkEndGiveaway(lnurl, tweet) {
@@ -75,11 +75,10 @@ async function checkEndGiveaway(lnurl, tweet) {
       lnbits_remote
     );
 
-    logger.info(`Giveaway status: ${updatedUsed}`);
-
+    logger.info(`Giveaway usage status: ${updatedUsed}`);
     used = updatedUsed;
   }
-
+  
   await endGiveaway(lnurl, tweet);
 }
 

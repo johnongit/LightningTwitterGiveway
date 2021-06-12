@@ -132,7 +132,7 @@ function delLnUrlW(params, lnbits_remote) {
   const options = {
     host: lnbits_remote.host,
     port: 443,
-    path: "/withdraw/api/v1/links/" + 1,
+    path: "/withdraw/api/v1/links/" + params.id,
     method: "DELETE",
     headers: {
       "X-Api-Key": lnbits_remote.admin_key,
@@ -143,9 +143,7 @@ function delLnUrlW(params, lnbits_remote) {
     const req = https.request(options, function (res) {
       if (res.statusCode == 204) {
         res.setEncoding("utf8");
-        res.on("data", function (chunk) {
-          resolve(chunk);
-        });
+        resolve()
       } else {
         reject(res);
       }
