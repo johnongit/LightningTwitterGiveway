@@ -1,4 +1,5 @@
 const https = require("https");
+const logger = require("./logger");
 
 function getWallet(lnbits_remote) {
   const options = {
@@ -61,7 +62,7 @@ function createLnUrlW(lnbits_remote, lnbits_lnurlw_params) {
       }
     });
     req.on("error", (err) => {
-      console.log("err");
+      logger.info("err", err);
       reject(err);
     });
 
@@ -80,6 +81,7 @@ function getLnUrlWImg(params, lnbits_remote) {
       "X-Api-Key": lnbits_remote.admin_key,
     },
   };
+
   return new Promise(function (resolve, reject) {
     const req = https.request(options, function (res) {
       if (res.statusCode == 200) {

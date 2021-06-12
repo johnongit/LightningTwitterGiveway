@@ -8,6 +8,7 @@ const convert = require("./utils/convertsvg.js");
 const twitter = require("./utils/twitter.js");
 
 const config = require("./config.js").lnbitsConfig;
+const logger = require("./utils/logger.js");
 
 const lnbits_remote = {
   admin_key: config.admin_key,
@@ -21,8 +22,7 @@ const lnbits_lnurlw_params = {
   wait_time: config.wait_time,
 };
 
-async function uploadLnUrlImg() {
-  // get SVG qrcode and convert it to png
+async function uploadLnUrlImg(lnurl) {
   const svg = await lnbitconnect.getLnUrlWImg(lnurl, lnbits_remote);
 
   // convert it and save it on a tmp file
@@ -36,11 +36,11 @@ async function uploadLnUrlImg() {
 
   // send tweet (start giveaway)
   const tweet = await twitter.sendTweet(media_id_string);
-  console.log(`You've successfully tweeted this : ${tweet.text}`);
+  logger.info(`You've successfully tweeted this : ${tweet.text}`);
+  return tweet;
 }
 
-function checkEndGiveaway() {
-  // each 10 seconds, cehck giveaway status
+function checkEndGiveaway(lnurl, tweet) {
   const interval = setInterval(async () => {
     const { used: updatedUsed } = await lnbitconnect.getLnUrlW(
       lnurl,
@@ -48,26 +48,27 @@ function checkEndGiveaway() {
     );
 
     if (updatedUsed >= config.uses) {
-      await endGiveaway();
+      await endGiveaway(lnurl, tweet);
       clearInterval(interval);
     }
   }, 10000);
 }
 
-async function endGiveaway() {
-  console.log("Giveway ened.");
+async function endGiveaway(lnurl, tweet) {
+  logger.info("Giveway ended.");
+
   try {
     await lnbitconnect.delLnUrlW(lnurl, lnbits_remote);
-    console.log("LNURL deleted");
+    logger.info("LNURL deleted");
   } catch (err) {
-    console.log("An error occured while trying to delete LNURL", err);
+    logger.info("An error occured while trying to delete LNURL", err);
   }
 
   try {
     let close = await twitter.replyTweet(tweet.id_str);
-    console.log(`Giveaway closing tweet has been sent : ${close.txt}`);
+    logger.info(`Giveaway closing tweet has been sent : ${close.txt}`);
   } catch (err) {
-    console.log(
+    logger.info(
       "An error occured while trying to send giveaway closing tweet",
       err
     );
@@ -89,12 +90,14 @@ async function runBot() {
 lnbitconnect
   .getWallet(lnbits_remote)
   .then(async function (wallet) {
-    console.log("Connected to wallet: ", wallet.name);
+    logger.info(`Connected to wallet: ${wallet.name}`);
 
     try {
       await runBot();
-    } catch (err) {}
+    } catch (err) {
+      logger.info("Error", err);
+    }
   })
-  .catch((err) => {
-    console.log("Cannot connect to lnbits wallets");
+  .catch(() => {
+    logger.info("Cannot connect to lnbits wallets");
   });
