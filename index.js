@@ -1,6 +1,7 @@
 const { resolve } = require("path");
 const { exit } = require("process");
 var fs = require('fs');
+const schedule = require('node-schedule')
 
 
 
@@ -66,9 +67,9 @@ async function runBot() {
         console.log("Le tweet de de fermeture a été envoyé ", tweet.txt)
         console.log("Close tweet sent ", tweet.txt)
        })
-       .catch (err){
+       .catch ((err) => {
         console.log("Cannot send close tweet")
-       }
+       })
 
 
 
@@ -87,6 +88,4 @@ lnbitconnect.getWallet(lnbits_remote)
 .catch((err) => {
     console.log("Cannot connect to lnbits wallets");
 })
-
-
 
