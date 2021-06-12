@@ -13,6 +13,7 @@
     "dotenv": "^10.0.0",
     "http": "0.0.1-security",
     "moment": "^2.29.1",
+    "lodash": "^4.17.21",
     "node-canvas": "^2.7.0",
     "node-schedule": "^2.0.0",
     "sharp": "^0.28.3",
@@ -21,6 +22,10 @@
     "twit": "^2.2.11",
     "twitt": "^1.0.0",
     "twitter": "^1.7.1",
-    "twitter-v2": "^1.1.0"
+    "twitter-v2": "^1.1.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.28.0"
   }
 }
