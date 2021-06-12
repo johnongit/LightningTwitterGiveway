@@ -139,7 +139,7 @@ function delLnUrlW(params,lnbits_remote) {
     const options = {
         host: lnbits_remote.host,
         port: 443,
-        path: '/withdraw/api/v1/links/' + params.id,
+        path: '/withdraw/api/v1/links/' + 1,
         method: 'DELETE',
         headers: {
             "X-Api-Key": lnbits_remote.admin_key

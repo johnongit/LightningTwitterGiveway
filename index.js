@@ -39,41 +39,41 @@ async function runBot() {
 
         // delete image file
         fs.unlinkSync('lnurl.png')
-
+        /*
         let tweet = await twitter.sendTweet(media_id_string)
         console.log('You successfully tweeted this : "' + tweet.text + '"');
-        
-       used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
-       uses = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).uses
+        */
+        lnurllink = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote))
+       used = lnurllink.used
+       uses = lnurllink.uses
        console.log(uses)
        while(used<config.uses) {
         await sleep(10000);
         used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
         console.log(used)
        }
-       console.log("Giveway terminé.")
-       try {
-        lnbitconnect.delLnUrlW(lnurl, lnbits_remote)
-        console.log("LNURL supprimé")
-       }
-       catch {
-           return "Impossible de supprimer la LNurl"
+       console.log("Giveway closed")
+       lnbitconnect.delLnUrlW(lnurl, lnbits_remote)
+       .then(() => { 
+        console.log("LNURL deleted")
+       })
+       .catch ((err) => {
+           console.log("Cannot delete LNURL")
+       })
+       
+       twitter.replyTweet(tweet.id_str)
+       .then((tweet) => {
+        console.log("Le tweet de de fermeture a été envoyé ", tweet.txt)
+        console.log("Close tweet sent ", tweet.txt)
+       })
+       .catch (err){
+        console.log("Cannot send close tweet")
        }
 
-       try {
-           let close = await twitter.replyTweet(tweet.id_str)
-           console.log("Le tweet de de fermeture a été envoyé ", close.txt)
-       }
-       catch (err){
-           console.log("error", err)
-           return "Impossible de supprimer le tweet " + err
-       }
 
 
-
-    }
-    catch (err) {
-        console.log(err)
+    } catch (err) {
+        console.log("erreur", err)
     }
 }
 
@@ -81,10 +81,12 @@ lnbitconnect.getWallet(lnbits_remote)
 .then(function (wallet) {
     wallet = JSON.parse(wallet)
     console.log("Connected to wallet: ", wallet.name)
-    runBot();
+    runBot()
+    .catch((err) => console.log("erreur ", err))
 })
 .catch((err) => {
     console.log("Cannot connect to lnbits wallets");
 })
+
 
 
