@@ -23,9 +23,10 @@ const lnbits_lnurlw_params = {
 };
 
 async function uploadLnUrlImg(lnurl) {
+  // get SVG qrcode
   const svg = await lnbitconnect.getLnUrlWImg(lnurl, lnbits_remote);
 
-  // convert it and save it on a tmp file
+  // convert it to png and save it on a tmp file
   await convert.convertSvg2Img(svg);
 
   // upload it to twitter
@@ -37,6 +38,7 @@ async function uploadLnUrlImg(lnurl) {
   // send tweet (start giveaway)
   const tweet = await twitter.sendTweet(media_id_string);
   logger.info(`You've successfully tweeted this : ${tweet.text}`);
+
   return tweet;
 }
 
@@ -47,7 +49,10 @@ function checkEndGiveaway(lnurl, tweet) {
       lnbits_remote
     );
 
+    logger.info(`Giveaway status: ${updatedUsed}`);
+
     if (updatedUsed >= config.uses) {
+      logger.info(`Giveaway reached limit ${config.uses}`);
       await endGiveaway(lnurl, tweet);
       clearInterval(interval);
     }
@@ -82,9 +87,9 @@ async function runBot() {
     lnbits_lnurlw_params
   );
 
-  await uploadLnUrlImg();
+  const tweet = await uploadLnUrlImg(lnurl);
 
-  checkEndGiveaway();
+  checkEndGiveaway(lnurl, tweet);
 }
 
 lnbitconnect
