@@ -30,51 +30,58 @@ function sleep(ms) {
   }
 async function runBot() {
     try {
+        // Create lnurl
         lnurl = await lnbitconnect.createLnUrlW(lnbits_remote, lnbits_lnurlw_params)
         lnurl = JSON.parse(lnurl)
+        // get SVG qrcode and convert it to png
         svg = await lnbitconnect.getLnUrlWImg(lnurl,lnbits_remote)
-        
         await convert.convertSvg2Img(svg)
+
+        // upload it to twitter
         let imgupld = await twitter.uploadImg()
         let media_id_string = imgupld.media_id_string
 
         // delete image file
         fs.unlinkSync('lnurl.png')
-        /*
+        
+        // send tweet (start giveaway)
         let tweet = await twitter.sendTweet(media_id_string)
         console.log('You successfully tweeted this : "' + tweet.text + '"');
-        */
+        
+        // check giveaway usage
         lnurllink = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote))
-       used = lnurllink.used
-       uses = lnurllink.uses
-       console.log(uses)
-       while(used<config.uses) {
-        await sleep(10000);
-        used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
-        console.log(used)
-       }
-       console.log("Giveway closed")
-       lnbitconnect.delLnUrlW(lnurl, lnbits_remote)
-       .then(() => { 
-        console.log("LNURL deleted")
-       })
-       .catch ((err) => {
-           console.log("Cannot delete LNURL")
-       })
-       
-       twitter.replyTweet(tweet.id_str)
-       .then((tweet) => {
-        console.log("Le tweet de de fermeture a été envoyé ", tweet.txt)
-        console.log("Close tweet sent ", tweet.txt)
-       })
-       .catch ((err) => {
-        console.log("Cannot send close tweet")
-       })
+        used = lnurllink.used
+        uses = lnurllink.uses
+        
+        //poll lnurl usage
+        while(used<config.uses) {
+            await sleep(10000);
+            used = JSON.parse(await lnbitconnect.getLnUrlW(lnurl, lnbits_remote)).used
+        }
+
+        // giveaway empty, delete lnurl and close it on twitter
+        console.log("Giveway closed")
+        lnbitconnect.delLnUrlW(lnurl, lnbits_remote)
+        .then(() => { 
+            console.log("LNURL deleted")
+        })
+        .catch ((err) => {
+            console.log("Cannot delete LNURL")
+        })
+        
+        twitter.replyTweet(tweet.id_str)
+        .then((tweet) => {
+            console.log("Le tweet de de fermeture a été envoyé ", tweet.txt)
+            console.log("Close tweet sent ", tweet.txt)
+        })
+        .catch ((err) => {
+            console.log("Cannot send close tweet")
+        })
 
 
 
     } catch (err) {
-        console.log("erreur", err)
+        console.log("Error", err)
     }
 }
 
@@ -83,9 +90,8 @@ lnbitconnect.getWallet(lnbits_remote)
     wallet = JSON.parse(wallet)
     console.log("Connected to wallet: ", wallet.name)
     runBot()
-    .catch((err) => console.log("erreur ", err))
+    .catch((err) => console.log("Error ", err))
 })
 .catch((err) => {
     console.log("Cannot connect to lnbits wallets");
 })
-
