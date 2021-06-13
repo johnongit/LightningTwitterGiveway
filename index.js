@@ -85,7 +85,7 @@ async function checkEndGiveaway(lnurl, tweet) {
       lnbits_remote
     );
 
-    logger.info(`Giveaway usage status: ${updatedUsed}`);
+    //logger.info(`Giveaway usage status: ${updatedUsed}`);
     used = updatedUsed;
   }
   
@@ -111,16 +111,16 @@ lnbitconnect
 
     try {
       const rule = new schedule.RecurrenceRule();
-      rule.minute=between(0,59)
-      rule.minute=40
+      // run the bot once a day randomly
+      rule.hour=between(0,23)
       const job = schedule.scheduleJob(rule, async function() {
         let date = new Date().toISOString()
         console.log("--------------")
         console.log(date);
         await runBot();
         job.cancel()
-        rule.minute=between(0,59)
-        rule.hour= moment().add(1,"hour").hour()
+        rule.hour=between(0,59)
+        rule.day= moment().add(1,"day").day()
         job.reschedule(rule)
       });
     } catch (err) {
