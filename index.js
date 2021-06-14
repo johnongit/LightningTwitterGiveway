@@ -10,6 +10,7 @@ const twitter = require("./utils/twitter.js");
 
 const config = require("./config.js").lnbitsConfig;
 const logger = require("./utils/logger.js");
+const { info } = require("console");
 
 const lnbits_remote = {
   admin_key: config.admin_key,
@@ -112,20 +113,29 @@ lnbitconnect
     try {
       const rule = new schedule.RecurrenceRule();
       // run the bot once a day randomly
-      rule.hour=between(0,23)
+      let hour=between(0,23)
+      let minute=between(0,59)
+      logger.info("--------------")
+      logger.info('Next job ' + hour + ':' + minute)
+
+      rule.minute=minute
+      rule.hour=hour
+      logger.info(rule)
       const job = schedule.scheduleJob(rule, async function() {
-        let date = new Date().toISOString()
         console.log("--------------")
-        console.log(date);
         await runBot();
         job.cancel()
-        rule.hour=between(0,59)
-        rule.day= moment().add(1,"day").day()
+        rule.minute=between(0,59)
+        rule.hour=between(0,23)
+        rule.date=moment().add(1,"days").date()
+
+        logger.info('Next job ' + rule.date + ':' + rule.hour + ':' + minute)
         job.reschedule(rule)
       });
     } catch (err) {
       logger.info(err);
     }
+    
 })
 .catch(() => {
   logger.info("Cannot connect to lnbits wallets");
