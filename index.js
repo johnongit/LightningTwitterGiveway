@@ -128,9 +128,7 @@ lnbitconnect
         rule.minute=between(0,59)
         rule.hour=between(0,23)
         rule.date=moment().add(1,"days").date()
-
-        logger.info('Next job ' + rule.date + ':' + rule.hour + ':' + minute)
-        job.reschedule(rule)
+        logger.info('Next job ' + rule.date + ' ' + rule.hour + ':' + minute)
       });
     } catch (err) {
       logger.info(err);
