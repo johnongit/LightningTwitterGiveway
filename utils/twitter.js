@@ -10,9 +10,12 @@ const client = new Twitter({
     access_token_secret: config.access_token_secret,
   });
 
-function sendTweet(media_id_string) {
+function sendTweet(media_id_string, lnurl_link) {
+     
+    let status = config.start_giveaway + "\n" + lnurl_link
+
     let message={
-        "status": config.start_giveaway,
+        "status": status,
         "media_ids": media_id_string
     }
     return new Promise(function(resolve, reject) {

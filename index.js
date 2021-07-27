@@ -9,6 +9,7 @@ const convert = require("./utils/convertsvg.js");
 const twitter = require("./utils/twitter.js");
 
 const config = require("./config.js").lnbitsConfig;
+const configTwitter = require("./config.js").twitterConfig
 const logger = require("./utils/logger.js");
 const { info } = require("console");
 
@@ -25,9 +26,12 @@ const lnbits_lnurlw_params = {
 };
 
 async function uploadLnUrlImg(lnurl) {
+  // Get Lnurl shareable link
+  let lnurl_link = "https://" + lnbits_remote.host + "/withdraw/" + lnurl.id
+
   // get SVG qrcode
   const svg = await lnbitconnect.getLnUrlWImg(lnurl, lnbits_remote);
-
+  
   // convert it to png and save it on a tmp file
   await convert.convertSvg2Img(svg);
 
@@ -38,10 +42,11 @@ async function uploadLnUrlImg(lnurl) {
   fs.unlinkSync("lnurl.png");
 
   // send tweet (start giveaway)
-  const tweet = await twitter.sendTweet(media_id_string);
+  const tweet = await twitter.sendTweet(media_id_string, lnurl_link);
   logger.info(`You've successfully tweeted this : ${tweet.text}`);
   return tweet;
 }
+
 
 function sleep(timeout) {
   return new Promise((resolve) => setTimeout(resolve, timeout));
@@ -105,30 +110,37 @@ async function runBot() {
   await checkEndGiveaway(lnurl, tweet);
 }
 
+
+
 lnbitconnect
   .getWallet(lnbits_remote)
   .then(async function (wallet) {
     logger.info(`Connected to wallet: ${wallet.name}`);
-
+    logger.info(configTwitter.start_giveaway)
     try {
       const rule = new schedule.RecurrenceRule();
       // run the bot once a day randomly
       let hour=between(0,23)
       let minute=between(0,59)
+      //let hour = moment().hours()
+      //let minute = moment().minutes()
+      let second = moment().add(1, "second").second()
       logger.info("--------------")
       logger.info('Next job ' + hour + ':' + minute)
 
+      //rule.second=second
       rule.minute=minute
       rule.hour=hour
-      logger.info(rule)
       const job = schedule.scheduleJob(rule, async function() {
         console.log("--------------")
         await runBot();
         job.cancel()
         rule.minute=between(0,59)
-        rule.hour=between(0,23)
+        rule.hour=between(7,21)
         rule.date=moment().add(1,"days").date()
         logger.info('Next job ' + rule.date + ' ' + rule.hour + ':' + minute)
+        job.reschedule(rule)
+
       });
     } catch (err) {
       logger.info(err);

@@ -100,6 +100,8 @@ function getLnUrlWImg(params, lnbits_remote) {
   });
 }
 
+
+
 function getLnUrlW(params, lnbits_remote) {
   const options = {
     host: lnbits_remote.host,
