@@ -27,9 +27,10 @@ function sendTweet(media_id_string, lnurl_link) {
     });
 }
 
-function replyTweet(status_id) {
+function replyTweet(status_id, balance) {
+    let status = config.stop_giveaway + "\r\n\r\nIl reste " + balance/1000 + " sats dans le faucet." 
     let message={
-        "status": config.stop_giveaway,
+        "status": status,
         "in_reply_to_status_id": status_id
     }
     return new Promise(function(resolve, reject) {

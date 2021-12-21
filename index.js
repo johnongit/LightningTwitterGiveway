@@ -13,6 +13,7 @@ const configTwitter = require("./config.js").twitterConfig
 const logger = require("./utils/logger.js");
 const { info } = require("console");
 
+
 const lnbits_remote = {
   admin_key: config.admin_key,
   host: config.host,
@@ -62,15 +63,22 @@ async function endGiveaway(lnurl, tweet) {
   logger.info("Giveway ended.");
 
   try {
-    await lnbitconnect.delLnUrlW(lnurl, lnbits_remote);
-    logger.info("LNURL deleted");
+    //await lnbitconnect.delLnUrlW(lnurl, lnbits_remote);
+   //logger.info("LNURL deleted");
   } catch (err) {
     logger.info("An error occured while trying to delete LNURL");
   }
 
   try {
-    let close = await twitter.replyTweet(tweet.id_str);
-    logger.info(`Giveaway closing tweet has been sent : ${close.text}`);
+    getWallet(lnbits_remote)
+    .then(async function (wallet) {
+      let close = await twitter.replyTweet(tweet.id_str, wallet.balance);
+      logger.info(`Giveaway closing tweet has been sent : ${close.text}`);
+    })
+    .catch(() => {
+      logger.info("Cannot connect to lnbits wallets");
+    });
+
   } catch (err) {
     logger.info(
       "An error occured while trying to send giveaway closing tweet",
@@ -120,7 +128,7 @@ lnbitconnect
     try {
       const rule = new schedule.RecurrenceRule();
       // run the bot once a day randomly
-      let hour=between(0,23)
+      let hour=between(7,21)
       let minute=between(0,59)
       //let hour = moment().hours()
       //let minute = moment().minutes()
